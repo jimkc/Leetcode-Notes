@@ -13,10 +13,9 @@ Space: O(1)
 ```python3
 class Solution:
             def arrayPairSum(self, nums):
-                
                 #:type nums: List[int]
                 #:rtype: int
-                
+
                 nums.sort()
                 max_sum_pair = 0
                 for i in range(0,len(nums),2):

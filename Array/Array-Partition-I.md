@@ -10,7 +10,7 @@ It seems to me that by pairing the neighbor numbers in the sorted list will resu
 ## Coding
 Time: O(nlogn); The sorting aldorithm of python is **Timsort** which is average O(nlogn), and the adding process goes through the whole array once. </br>
 Space: O(1)
-```python
+```python3
 class Solution:
             def arrayPairSum(self, nums):
                 """

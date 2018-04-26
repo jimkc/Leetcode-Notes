@@ -8,7 +8,7 @@ Explanation: n is 2, and the maximum sum of pairs is 4 = min(1, 2) + min(3, 4).
 ## Thinking
 It seems to me that by pairing the neighbor numbers in the sorted list will result the maximum value.
 ## Coding
-Time: O(nlogn); The sorting aldorithm of python is **Timsort** which is average O(nlogn), and the adding process goes through the whole array once. 
+Time: O(nlogn); The sorting aldorithm of python is **Timsort** which is average O(nlogn), and the adding process goes through the whole array once. </br>
 Space: O(1)
 ```python
 class Solution:

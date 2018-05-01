@@ -2,9 +2,10 @@
 Given two binary trees and imagine that when you put one of them to cover the other, some nodes of the two trees are overlapped while the others are not.
 
 You need to merge them into a new binary tree. The merge rule is that if two nodes overlap, then sum node values up as the new value of the merged node. Otherwise, the NOT null node will be used as the node of new tree.
-**Example :**   
+**Example :**
+<pre>
 Input:</br> 
-<code>&nbsp;</code>Tree 1                     Tree 2                
+Tree 1                     Tree 2                
           1                         2                             
          / \                       / \                            
         3   2                     1   3                        
@@ -17,23 +18,38 @@ Merged tree:
 	   4   5
 	  / \   \ 
 	 5   4   7
+</pre>
 Note: The merging process must start from the root nodes of both trees.
 
 ## Thinking
 It seems to me that by pairing the neighbor numbers in the sorted list will result the maximum value.
 ## Coding
-Time: O(nlogn); The sorting aldorithm of python is **Timsort** which is average O(nlogn), and the adding process goes through the whole array once. </br>
-Space: O(1)
+Time: O(m); A total of mm nodes need to be traversed. Here, mm represents the minimum number of nodes from the two given trees. </br>
+Space: O(m)
 ```python3
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
 class Solution:
-            def arrayPairSum(self, nums):
-                #:type nums: List[int]
-                #:rtype: int
-
-                nums.sort()
-                max_sum_pair = 0
-                for i in range(0,len(nums),2):
-                    max_sum_pair += nums[i] 
-                return max_sum_pair
+    def mergeTrees(self, t1, t2):
+        """
+        :type t1: TreeNode
+        :type t2: TreeNode
+        :rtype: TreeNode
+        """
+        
+        if t1 and t2:
+            root = TreeNode(t1.val + t2.val)
+            root.left = self.mergeTrees(t1.left, t2.left)
+            root.right = self.mergeTrees(t1.right, t2.right)
+            return root
+        else: 
+            return t1 or t2
+        
+            
+        
 ```
 

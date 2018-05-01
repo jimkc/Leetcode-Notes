@@ -25,7 +25,7 @@ matrix[i][j] will be integers in range [0, 99].
 ## Thinking
 Each index of a matrix only has to compare with the right left to see if they are the same. (Make the problem small.)
 ## Coding
-Time: O(m*n). m*n matrix.
+Time: O(m*n). m*n matrix.</br>
 Space: O(1)
 ```python3
 class Solution:

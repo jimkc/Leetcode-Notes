@@ -38,10 +38,10 @@ Note:
 2.The given r and c are all positive.
 
 ## Thinking
-
+Traverse through all the elements in the original matrix. Count the index for each element to put it in the new matrix.
 ## CodingInput: 
-Time: O(nlogn); The sorting aldorithm of python is **Timsort** which is average O(nlogn), and the adding process goes through the whole array once. </br>
-Space: O(1)
+Time: O(m*n) 
+Space: O(m*n)
 ```python3
 class Solution:
     def matrixReshape(self, nums, r, c):

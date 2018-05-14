@@ -3,6 +3,7 @@ We have two special characters. The first character can be represented by one bi
 
 Now given a string represented by several bits. Return whether the last character must be a one-bit character or not. The given string will always end with a zero.
 </br>
+
 **Example 1:**
 <pre>
 Input: 

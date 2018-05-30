@@ -21,6 +21,7 @@ You are guaranteed to have only one unique value in the BST that is closest to t
 
 
 ## Thinking
+While we want infinity value, it is much more efficient to use float("inf").</br>
 
 ## Coding
 Time: O(logn); Go through the binary tree. </br>

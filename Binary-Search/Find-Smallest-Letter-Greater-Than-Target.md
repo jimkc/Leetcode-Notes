@@ -38,9 +38,9 @@ Output: "c"
 
 Note:
 
-**1.** letters has a length in range [2, 10000].
-**2.** letters consists of lowercase letters, and contains at least 2 unique letters.
-**3.** target is a lowercase letter.
+**1.** letters has a length in range [2, 10000]. </br>
+**2.** letters consists of lowercase letters, and contains at least 2 unique letters.</br>
+**3.** target is a lowercase letter.</br>
 
 ## Thinking
 Think about the situation while the two pointers left and right are meeting with each other.</br>

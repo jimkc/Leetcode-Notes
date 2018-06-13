@@ -1,7 +1,7 @@
 ## Question
-Given a set of keywords words and a string S, make all appearances of all keywords in S bold. Any letters between <b> and </b> tags become bold.
+Given a set of keywords words and a string S, make all appearances of all keywords in S bold. Any letters between <b> and </b> tags become bold.<br>
 
-The returned string should use the least number of tags possible, and of course the tags should form a valid combination.
+The returned string should use the least number of tags possible, and of course the tags should form a valid combination.<br>
 
 **Example :**
 <pre>
@@ -10,9 +10,9 @@ For example, given that words = ["ab", "bc"] and S = "aabcd", we should return "
 
 Note:
 
-words has length in range [0, 50].
-words[i] has length in range [1, 10].
-S has length in range [0, 500].
+words has length in range [0, 50].<br>
+words[i] has length in range [1, 10].<br>
+S has length in range [0, 500].<br>
 All characters in words[i] and S are lowercase letters.
 
 

@@ -22,7 +22,7 @@ Merged tree:
 Note: The merging process must start from the root nodes of both trees.
 
 ## Thinking
-Recursively adding tree nodes in preorder traversal. Tree nodes are allowed to be NULL, so it is suitable to us or condition while t1,t2 are both null.
+Recursively adding tree nodes in preorder traversal. Tree nodes are allowed to be NULL, so it is suitable to use or condition while t1,t2 are both null.
 ## Coding
 Time: O(m); A total of mm nodes need to be traversed. Here, mm represents the minimum number of nodes from the two given trees. </br>
 Space: O(m)

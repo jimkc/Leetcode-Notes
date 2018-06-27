@@ -52,3 +52,14 @@ class Solution:
         return ans
             
 ```
+
+Special Solution:
+```python3
+### DFS, just like the 681, "HH:MM", form the next closest time   O(1), O(1)
+    ans = []
+    for i in range(12*60):  # get all possible time from 0:00 - 11:59
+        hours, mints = divmod(i,60)  # get the hour and mints
+        if  (bin(hours) + bin(mints)).count('1') == num:    # check if the number of '1' is num
+            ans.append("{:01}:{:02}".format(hours,mints))  
+    return ans
+```

@@ -29,7 +29,7 @@ All the tilt values won't exceed the range of 32-bit integer.
 
 ## Coding
 Time: O(n); . </br>
-Space: O(logn).
+Space: O(n) For tree in worst case(skewed depth).
 ```python3
 # Definition for a binary tree node.
 # class TreeNode:

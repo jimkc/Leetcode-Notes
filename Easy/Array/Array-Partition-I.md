@@ -6,7 +6,7 @@ Given an array of 2n integers, your task is to group these integers into n pairs
 Input: [1,4,3,2] </br>
 Output: 4 </br>
 Explanation: n is 2, and the maximum sum of pairs is 4 = min(1, 2) + min(3, 4).
-<pre>
+</pre>
 
 ## Thinking
 It seems to me that by pairing the neighbor numbers in the sorted list will result the maximum value.

@@ -12,7 +12,7 @@ Explanation: Three palindromic strings: "a", "b", "c".
 Input: "aaa"
 Output: 6
 Explanation: Six palindromic strings: "a", "a", "a", "aa", "aa", "aaa".
-<pre>
+</pre>
 
 ## Thinking
 

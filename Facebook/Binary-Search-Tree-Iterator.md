@@ -22,7 +22,7 @@ Space: O(h) height.
 
 class BSTIterator(object):
     def __init__(self, root):
-        """
+        """x
         :type root: TreeNode
         """
         self.stack = []

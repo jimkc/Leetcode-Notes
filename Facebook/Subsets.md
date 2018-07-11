@@ -17,7 +17,7 @@ Output:
   [1,2],
   []
 ]
-<pre>
+</pre>
 
 ## Thinking
 

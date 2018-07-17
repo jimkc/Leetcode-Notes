@@ -35,6 +35,7 @@ Explanation: The endWord "cog" is not in wordList, therefore no possible transfo
 </pre>
 
 ## Thinking
+Use BFS with queue.
 
 
 ## Coding
@@ -60,6 +61,7 @@ class Solution:
             if word == endWord:
                 return length
             
+            # Find the word that differs only one char and in wordlist
             for c in 'abcdefghijklmnopqrstuvwxyz':
                 for i in range(len(word)):
                     next_word = word[:i] + c + word[i+1:]

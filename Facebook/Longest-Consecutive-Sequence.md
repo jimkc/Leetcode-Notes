@@ -11,7 +11,7 @@ Explanation: The longest consecutive elements sequence is [1, 2, 3, 4]. Therefor
 </pre>
 
 ## Thinking
-
+Array and Union Find.
 
 ## Coding
 Time: O(n); Go through all num once.<br>

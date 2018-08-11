@@ -26,15 +26,6 @@ Time: O(logn); <br>
 Space: O(1)
 ```python3
 class Solution:
-            def arrayPairSum(self, nums):
-                #:type nums: List[int]
-                #:rtype: int
-
-                nums.sort()
-                max_sum_pair = 0
-                for i in range(0,len(nums),2):
-                    max_sum_pair += nums[i] 
-                return max_sum_pairclass Solution:
     def search(self, nums, target):
         """
         :type nums: List[int]

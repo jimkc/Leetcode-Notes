@@ -50,7 +50,7 @@ class Solution:
             if nums[mid] == target:
                 return mid
             
-            if nums[low] <= nums[mid]: # It means mid in the left part (first ascending part)
+            if nums[low] <= nums[mid]: 
                 if nums[low] <= target <= nums[mid]:
                     high = mid - 1
                 else:

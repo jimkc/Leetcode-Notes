@@ -11,7 +11,7 @@ Output: ["255.255.11.135", "255.255.111.35"]
 
 
 ## Coding
-Time: O(n);<br>
+Time: O();<br>
 Space: O(n)
 ```python3
 class Solution:

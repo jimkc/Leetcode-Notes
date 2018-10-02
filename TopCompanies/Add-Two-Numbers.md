@@ -28,6 +28,7 @@ class Solution:
         :type l2: ListNode
         :rtype: ListNode
         """
+        prev = None
         head = l1
         carry = 0
         while l1 and l2:

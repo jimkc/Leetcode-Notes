@@ -31,29 +31,25 @@ Space: O(n)
 #         self.left = None
 #         self.right = None
 
+from collections import deque
 class Solution(object):
     def levelOrder(self, root):
         """
         :type root: TreeNode
         :rtype: List[List[int]]
         """
-        self.level = []
-        
-        def BFS(root, lv):
-             
-            if root == None:
-                return None
-            
-            if lv > len(self.level) -1 :
-                self.level.append([root.val])
-            else:
-                self.level[lv].append(root.val)
-            BFS(root.left, lv+1)
-            BFS(root.right, lv+1)
-
-            
-            
-        BFS(root,0)
-        
-        return  (self.level)
+        q, result = deque(), []
+        if root:
+            q.append(root)
+        while len(q):
+            level = []
+            for _ in range(len(q)):
+                x = q.popleft()
+                level.append(x.val)
+                if x.left:
+                    q.append(x.left)
+                if x.right:
+                    q.append(x.right)
+            result.append(level)
+        return result
 ```

@@ -8,7 +8,9 @@ see picture in leetcode.
 ## Thinking
 All process is built on the inorder traverse of BST, and the four steps we do recursively are as below: <br> 
 1. 記錄 dfs path到stack<br>
-
+2. 判斷是否遇到 None node（代表前一步是往左走的極限）若遇到就從 stack 上把我們最後走到但是還沒處理過的最左邊node pop出來<br>
+3. 把這個node的 prev和此node的 double link 建立起來
+4. node向右子node移動 （若右子node是none第二步便會pop掉一個目前最左的）
 
 ## Coding
 Time: O(n); Go through all node once</br>

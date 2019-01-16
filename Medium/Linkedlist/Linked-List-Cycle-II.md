@@ -23,7 +23,7 @@ Explanation: There is no cycle in the linked list.
 ## Thinking
 這個問題可以拆成兩部分來看。
 1. 第一部分，先檢查有沒有cycle的存在，利用兩個pointer，一個快一個慢，若他們會相遇就代表有cycle存在，並令相遇的點稱為X。<br>
-2. 第二部分是找出entry point (定義為E)，這部分我們用數學是證明。<br>
+2. 第二部分是找出entry point (定義為E)，這部分我們用數學式證明。<br>
    因為第一部分的快和慢pointer，所以我們可以把他們走的距離寫成一個等式。令起始點叫做H，走一圈cycle的距離叫做C<br>
    -> 2(HE + EX) = HE + nC + EX (這邊的n是不知道走了幾圈)<br>
    -> HE  = nC -EX<br>

@@ -21,6 +21,8 @@ The two tuples are:
 </pre>
 
 ## Thinking
+Divide the whole into 2 groups, do half first then see the adding results of another whether their opposite 
+value is in the seen set.
 
 
 ## Coding

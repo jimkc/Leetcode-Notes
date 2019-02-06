@@ -9,6 +9,8 @@ The sum that is closest to the target is 2. (-1 + 2 + 1 = 2).
 </pre>
 
 ## Thinking
+這題的觀念是用三個指標，其中一個是current，會go through整個array，另外兩個分別以current+1和last開始往內夾擠。<br>
+第二個方式是每次在夾擠前先檢查current和最小的兩個有沒有比target大，或最大的兩個有沒有比target小，這樣就可以直接跳過。
 
 ## Coding
 Time: O(n^2);

@@ -13,7 +13,7 @@ Output: 7 -> 8 -> 0 -> 7
 </pre>
 
 ## Thinking
-It seems to me that by pairing the neighbor numbers in the sorted list will result the maximum value.
+The second version is much better, think with math.
 
 ## Coding
 Time: O(n);<br>

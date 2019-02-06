@@ -17,6 +17,9 @@ A solution set is:
 </pre>
 
 ## Thinking
+This question is similar to 3Sum-Closet, but implemented in  a different way.<br>
+We use i to iterate through array, and j to iterate from i+1 to last, also we record nums[i] in a set to know what kind of 
+numbers we have walked through before, if -(nums[i]+nums[j]) is in seen, then we put it in the answer.
 
 ## Coding
 Time: O(n^2);<br>

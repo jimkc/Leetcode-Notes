@@ -24,7 +24,9 @@ Note:<br>
 0 <= fee < 50000.
 
 ## Thinking
-
+1. The critical part in DP is to keep the best situation of a choice to be record, in other cases choice may be direction, in here it is (a) to keep no stock in hand or (b) to keep one stock of this company in hand<br>
+2. We use "cash" to stand for the best profit till now to have no stock in my hand at this moment, and "hold" to stand for the best profit we can earn now to have one stock in our hand at this moment.<br>
+3. In point 2, cash and hold are choices, we still have to find best situation that results to those choices. (combined by the best "cash" and the best "hold" resulted from the last trade)
 
 ## Coding
 Time: O(n); <br>

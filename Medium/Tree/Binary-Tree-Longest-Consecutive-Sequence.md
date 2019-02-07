@@ -36,7 +36,9 @@ Explanation: Longest consecutive sequence path is 2-3, not 3-2-1, so return 2.
 </pre>
 
 ## Thinking
-
+1. Use dfs<br>
+2. While walking a path from root to leaf, record the longest sequence to the current node, then keep tracing the left node and right node.<br>
+3. Compare the left , right(not always longer, might restart from 1 if not parent+1 value) and cur return which is longer and return
 
 ## Coding
 Time: O(n);<br>

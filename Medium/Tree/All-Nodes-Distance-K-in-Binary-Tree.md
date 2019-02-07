@@ -23,7 +23,9 @@ The target node is a node in the tree.:<br>
 0 <= K <= 1000
 
 ## Thinking
-
+1. Recoed all the parents for the node, so we can do bfs for target node
+2. Use a queus to do bfs
+3. Check if the node has seen for bfs with set, so we dont traverse back (important part for bfs)
 
 ## Coding
 Time: O(n); <br>
@@ -53,11 +55,12 @@ class Solution:
         while q:
             if q[0][1] == K:
                 ans.append(q[0][0].val)
-                
+            
+            # queue    
             node, distance = q.popleft()
             
             for nei in [node.par, node.left, node.right]:
-                if nei and nei not in seen:
+                if nei and nei not in seen: # so we dont walk back, and distance can always +1
                     q.append([nei, distance+1])
                     seen.add(nei)
         

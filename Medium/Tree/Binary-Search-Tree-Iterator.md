@@ -7,6 +7,10 @@ Note: next() and hasNext() should run in average O(1) time and uses O(h) memory,
 
 
 ## Thinking
+1. Initial stat point is the leftest node<br>
+2. nxt check only right child, because left is always smaller ones which we have already go through.<br>
+3. If we have a right child, initialize start point to the right childs, leftest.<br>
+4. This is an inorder traversal.
 
 ## Coding
 Time: O(1) In average for next and has nxt ; 

@@ -18,7 +18,8 @@ return its level order traversal as:
 </pre>
 
 ## Thinking
-
+We use len(q) because we only want to pop out all current level nodes and add them to the level list.<br>
+Whenever we pop out a node we add its children to the queue, and saved it to pop in the next loop of while.
 
 ## Coding
 Time: O(n); 

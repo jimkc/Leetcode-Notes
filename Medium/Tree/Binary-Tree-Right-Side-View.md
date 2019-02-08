@@ -15,6 +15,8 @@ Explanation:
 </pre>
 
 ## Thinking
+Always go left first, and we have to do dfs, so that we can make sure we go through to the deepest node.<br>
+Record  the node only when we see it at the first sight.
 
 
 ## Coding

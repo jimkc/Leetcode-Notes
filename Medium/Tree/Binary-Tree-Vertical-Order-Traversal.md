@@ -71,6 +71,10 @@ Output:
 </pre>
 
 ## Thinking
+1.  Use BFS instead of DFS because the record values in an index have to traverse from top to down.<br>
+2.  Use a dequeue to traverse node idx and value<br>
+3.  Use a dictionary to record node for each index
+
 
 ## Coding
 Time: O(n); <br>

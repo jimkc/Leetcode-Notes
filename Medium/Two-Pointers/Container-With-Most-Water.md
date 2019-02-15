@@ -3,7 +3,7 @@ Given n non-negative integers a1, a2, ..., an , where each represents a point at
 
 Note: You may not slant the container and n is at least 2.<br>
 
-pic: https://leetcode.com/problems/container-with-most-water/description/
+pic: https://leetcode.com/problems/container-with-most-water/description/<br>
 **Example :**   
 <pre>
 Input: [1,8,6,2,5,4,8,3,7]
@@ -11,7 +11,10 @@ Output: 49
 </pre>
 
 ## Thinking
-https://leetcode.com/problems/container-with-most-water/solution/
+https://leetcode.com/problems/container-with-most-water/solution/<br>
+Two pointers starts from outside to inside, since the amount of water depends on the lower line, so while moving pointers toward middle only by moving the shorter one can have the chance to improve the amount of water.<br>
+
+
 
 ## Coding
 Time: O(n);<br>

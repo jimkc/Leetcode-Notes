@@ -29,6 +29,9 @@ A solution set is:
 </pre>
 
 ## Thinking
+For dfs solution, while using dfs we are able to get all combinations, however we dont want duplicates, so<br>
+1. We sort candidates, and while dfs candidates we let the item in selected stack is always small to big, therefore while traversing the candidates we dont take combinations that has appeared already.<br>
+2. Call backtrack because we check every time we are doing dfs.
 
 
 ## Coding
@@ -82,7 +85,7 @@ class Solution:
             for item in candidates:
                 if item > remain: 
                     break
-                if stack and item < stack[-1]: # Prevent the duplicate combinations, because it is sorted
+                if stack and item < stack[-1]: # Prevent the duplicate combinations, because it is sorted, the smaller combination is taken in earlier function calls.
                     continue
                 else:
                     dfs(remain - item, stack + [item])

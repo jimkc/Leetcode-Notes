@@ -37,6 +37,7 @@ class Solution:
             else:
                 count += 1
             
+            # only have to record once, the leftest one
             if count in table:
                 max_length = max(max_length, index - table[count])
             else:

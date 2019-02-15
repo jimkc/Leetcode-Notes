@@ -26,7 +26,9 @@ How does it change the problem?<br>
 What limitation we need to add to the question to allow negative numbers?
 
 ## Thinking
-
+1. 第一步驟先對dp要用的值做初始化，算各個數字出現的次數（最基本的組合就是自己），而這個dp表格的大小就是我們target的大小。
+2. 每個表格裡的數字可以代表那個index值有幾種組合（ex:index k，加起來=k有幾種組合）。dp從最base case出發，
+也就是我們nums裡出現最小的數字，然後用每個nums裡的數字加上這個index，若沒有超過就把這個index的值（累積到目前的組合數目）＋ nums裡這個數字在此前有多少組合了（nums[i]）
 
 ## Coding
 Time: O(target*n); <br>
@@ -39,11 +41,13 @@ class Solution:
         :type target: int
         :rtype: int
         """
+        # Initialize: Count freq of each number
         dp = [0]*(target+1)
         for n in nums:
             if n <= target:
                 dp[n] += 1 
         
+        # Use dp from small sum to large sum
         for i in range(1,len(dp)):
             if dp[i] != 0:    # if it's 0 (combinations) then we cant use it as dp to combine other nums to a new num
                 for n in nums:

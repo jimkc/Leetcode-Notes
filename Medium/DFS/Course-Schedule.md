@@ -26,7 +26,10 @@ The input prerequisites is a graph represented by a list of edges, not adjacency
 You may assume that there are no duplicate edges in the input prerequisites.
 
 ## Thinking
-It seems to me that by pairing the neighbor numbers in the sorted list will result the maximum value.
+1. This problem can be viewed as a graph problem, while prerequisites are the next class this class points to, if we walk through every path and find no cycles, then it is possible to complete all courses.<br>
+2. The reason we dont use dictionary is because vertex in the graph might point to more than one classes, in such case dfs is better.<br>
+3. While we start to walk from a vertex, every time we step on a vertex that is zero (never be visited) we set it to -1, and if we didnt end dfs(still on the path) and we met -1 again, it means we encoutered a cycle.<br>
+3. If we finish traversing all prerequisites vertex paths (dfs function calls are finished) we set vertex to one as a safe node (no cycles guaranteed to start from this node), so next time other nodes came we can just return and no need to walk again.
 
 ## Coding
 Time: O(n);<br>
@@ -47,6 +50,7 @@ class Solution:
         for x,y in prerequisites :
             graph[x].append(y)
         
+        # go through all vertexes
         for i in range(numCourses):
             if self.hasCycle(i, visited, graph):
                 return False
@@ -54,13 +58,14 @@ class Solution:
         
     def hasCycle(self, lesson, visited, graph):
         
-        if visited[lesson] == -1: # The node being visited in the walking path will be marked -1
+        if visited[lesson] == -1: # The node is visited in the current walking path 
             return True
-        elif visited[lesson] == 1: # The node that has been walked through as the first node to others and has no  cycle
+        elif visited[lesson] == 1: # The node that has been walked through as the first node to others and has no cycle (already a safe path)
             return False
         else:
             visited[lesson] = -1 # Set as visited
         
+        # keep walking the pre nodes until 
         for pre in graph[lesson]:
             if self.hasCycle(pre, visited, graph):
                 return True

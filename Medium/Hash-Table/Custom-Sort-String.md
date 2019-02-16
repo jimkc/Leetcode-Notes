@@ -23,7 +23,7 @@ T has length at most 200.<br>
 S and T consist of lowercase letters only.
 
 ## Thinking
-
+1. Collection counter helps a lot
 
 ## Coding
 Time: O(n); <br>

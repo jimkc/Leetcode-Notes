@@ -28,7 +28,7 @@ The input prerequisites is a graph represented by a list of edges, not adjacency
 You may assume that there are no duplicate edges in the input prerequisites.
 
 ## Thinking
-Go through each path and record the pre classes in dfs order.
+Same as Course-Schedule.md
 
 ## Coding
 Time: O(n); 

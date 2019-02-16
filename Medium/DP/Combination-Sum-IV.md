@@ -29,7 +29,7 @@ What limitation we need to add to the question to allow negative numbers?
 1. 第一步驟先對dp要用的值做初始化，算各個數字出現的次數（最基本的組合就是自己），而這個dp表格的大小就是我們target的大小。
 2. 每個表格裡的數字可以代表那個index值有幾種組合（ex:index k，加起來=k有幾種組合）。dp從最base case出發，
 也就是我們nums裡出現最小的數字，然後用每個nums裡的數字加上這個index，若沒有超過就把這個index的值（累積到目前的組合數目）＋ nums裡這個數字在此前有多少組合了（nums[i]）
-
+3. 因為從最小的dp開始，所以每次加完都會是比自己大的值累積在dp array，因此在iterate的時候就可以直接
 ## Coding
 Time: O(target*n); <br>
 Space: O(target)

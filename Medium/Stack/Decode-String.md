@@ -15,7 +15,7 @@ s = "2[abc]3[cd]ef", return "abcabccdcdcdef".
 </pre>
 
 ## Thinking
-
+1. While we meet left square brackets, throw the string and num to stack, while we meet right brackets pop and count the string times number than add it to previous met string.
 
 ## Coding
 Time: O(n);<br>

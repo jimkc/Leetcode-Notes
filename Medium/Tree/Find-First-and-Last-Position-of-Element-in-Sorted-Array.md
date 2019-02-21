@@ -35,36 +35,26 @@ class Solution:
         idxr = -1 # Rightest index
         idxl = -1 # Leftest index
         
-        l, r = 0, len(nums)-1
-        # Find random one of the target
-        while l <= r:
-            mid = (l+r)//2
-            
-            if  nums[mid] == target:
-                idx = mid
-                break
-            elif nums[mid] > target:
-                r = mid - 1
-            else:
-                l = mid + 1
-            
+        
 
-        l1, r1 = idx, len(nums)-1
+        l1, r1 = 0, len(nums)-1
         # Find the rightest target in right half 
         while l1 <= r1: 
-            mid = (l1+r1)//2
             
+            mid = (l1+r1)//2
             if nums[mid] == target:
                 if mid == len(nums)-1 or nums[mid+1] != target: 
                     idxr = mid
                     break
                 else:
                     l1 = mid+1
+            elif nums[mid] < target:
+                l1 = mid+1
             else:
                 r1 = mid-1
         
         
-        l2, r2 = 0, idx
+        l2, r2 = 0, len(nums)-1
         # Find the leftest target in left half 
         while l2 <= r2:
             mid = (l2+r2)//2
@@ -75,6 +65,8 @@ class Solution:
                     break
                 else:
                     r2 = mid-1
+            elif nums[mid] > target:
+                r2 = mid -1
             else:
                 l2 = mid+1
         

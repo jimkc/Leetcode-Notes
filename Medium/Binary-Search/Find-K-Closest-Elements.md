@@ -34,10 +34,12 @@ class Solution:
         idx = self.binary_search(arr, x)
         
         # i to k is a k size window
+        # window starts from k items at the left of x
         i = idx-k if (idx-k) >= 0 else 0 # Because smaller idx is prier
         j = i+k-1
     
         # mv window from left to right, if right is nearer than left than mv window
+        # the window size is i-1 to j 
         while j+1 < len(arr) and abs(arr[j+1] - x) < abs(arr[i] - x): 
             i += 1
             j += 1

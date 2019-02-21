@@ -107,6 +107,7 @@ class MedianFinder:
     def addNum(self, num):
         small, large = self.heaps
         heappush(small, -heappushpop(large, num))
+        #maintain the number of len(large) >= len(small)  
         if len(large) < len(small):
             heappush(large, -heappop(small))
 

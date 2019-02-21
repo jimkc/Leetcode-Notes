@@ -32,7 +32,7 @@ Functions could be called recursively, and will always end.<br>
 1 <= n <= 100
 
 ## Thinking
-
+1. Each time we pop out a question we get the time from start to end, and we delete the time that the recursive functions called inside this function.
 
 ## Coding
 Time: O(logs);<br>
@@ -62,6 +62,10 @@ class Solution:
                 start_func, start_time, not_contain = stack.pop() # Previous func must be the same as end
                 duration = time - start_time + 1 - not_contain # not contain means the time not belong to this func
                 ans[func] += duration
+               
+                # the below process adds a the time that the pop function runs to not_contain
+                # so that we dont add the inner recursive function to the exclusive time of the 
+                # outer function
                 if stack:
                     stack[-1][-1] += time - start_time + 1 # These time belongs to other func
                 

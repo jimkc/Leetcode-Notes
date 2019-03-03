@@ -14,8 +14,10 @@ Explanation: 342 + 465 = 807.
 
 ## Coding
 Time: O(n); <br>
-Space: O(1)
-```python3
+Space: O(1)<br>
+
+python version:
+```python
 # class ListNode:
 #     def __init__(self, x):
 #         self.val = x
@@ -52,4 +54,70 @@ class Solution:
         
         return head
 ```
+
+java version:
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) { val = x; }
+ * }
+ */
+import java.util.*;
+class Solution {
+    public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+        
+        ListNode dummy = new ListNode(0);
+        dummy.next = l1;
+        ListNode prev = dummy;
+        int carry = 0;
+        
+        while(l1!=null && l2!=null){
+            
+            int sum = l1.val+l2.val+carry;
+            int value = sum%10;
+            carry = (int)sum/10;
+
+            l1.val = value;
+            prev = l1;
+            l1 = l1.next;
+            l2 = l2.next;
+            
+        }
+        
+        ListNode l = null;
+        
+        if(l1!=null){
+            l = l1;
+        }
+        else{
+            l = l2;
+        }
+        
+        prev.next = l;
+        //System.out.println(carry);
+        while(l!=null){
+            int sum = l.val+carry;
+            int value = sum%10;
+            carry = (int)sum/10;
+            
+            l.val = value;
+            prev = l;
+            l = l.next;
+        }
+        
+        if (carry!=0){
+            ListNode node = new ListNode(carry);
+            prev.next = node;
+        }
+        
+        
+        return dummy.next;
+    }
+}
+```
+
+
 

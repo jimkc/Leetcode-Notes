@@ -36,7 +36,7 @@ A convenient way to split by stripping words after they are first split by " ".
 ## Coding
 Time: O(P+B); P means paragraph, B means banned. </br>
 Space: O(P+B); P for collection, B for banned set.
-```python3
+```python
 class Solution:
     def mostCommonWord(self, paragraph, banned):
         """
@@ -53,5 +53,34 @@ class Solution:
             if item[0] not in banned:
                 return item[0]
                 
+```
+```java
+class Solution {
+    public String mostCommonWord(String paragraph, String[] banned) {
+        Set<String> ban_words = new HashSet<>(Arrays.asList(banned));
+        Map<String, Integer> cnt  = new HashMap<>();
+        String[] words = paragraph.replaceAll("\\W+"," ").split(" ");
+        
+        for(int i=0; i < words.length; i++){
+            if(ban_words.contains(words[i])==false){
+                String w = words[i].toLowerCase();
+                cnt.put(w, cnt.getOrDefault(w, 0)+1);
+            }
+            
+        }
+        
+        String maxFreqWord = "";
+        Integer maxCnt = 0;
+        
+        for(Map.Entry<String, Integer> pair: cnt.entrySet()){
+            if(pair.getValue()>maxCnt){
+                maxFreqWord = pair.getKey();   
+                maxCnt = pair.getValue();
+            }
+        }
+        
+        return maxFreqWord;
+    }
+}
 ```
 

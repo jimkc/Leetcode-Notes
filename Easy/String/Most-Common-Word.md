@@ -35,7 +35,9 @@ A convenient way to split by stripping words after they are first split by " ".
 
 ## Coding
 Time: O(P+B); P means paragraph, B means banned. </br>
-Space: O(P+B); P for collection, B for banned set.
+Space: O(P+B); P for collection, B for banned set.<br>
+
+python version
 ```python
 class Solution:
     def mostCommonWord(self, paragraph, banned):
@@ -54,6 +56,7 @@ class Solution:
                 return item[0]
                 
 ```
+java version:
 ```java
 class Solution {
     public String mostCommonWord(String paragraph, String[] banned) {

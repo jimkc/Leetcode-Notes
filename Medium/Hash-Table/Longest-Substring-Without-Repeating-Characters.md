@@ -14,8 +14,10 @@ Given "pwwkew", the answer is "wke", with the length of 3. Note that the answer 
 
 ## Coding
 Time: O(n);<br>
-Space: O(n)
-```python3
+Space: O(n)<br>
+
+python3 version
+```python
 class Solution:
     def lengthOfLongestSubstring(self, s):
         """
@@ -42,3 +44,43 @@ class Solution:
         return max(max_length,len(s)-1-start+1)
 ```
 
+
+java version:
+```java
+class Solution {
+    public int lengthOfLongestSubstring(String s) {
+        Map<Character, Integer> charIndex = new HashMap<>();
+        int ans = 0;
+        int start = 0;
+        int i=0;
+        
+        while(i<s.length()){
+            if(charIndex.containsKey(s.charAt(i))==false){
+                charIndex.put(s.charAt(i), i);
+            }
+            else{
+                
+                int prevIndex = charIndex.get(s.charAt(i));
+                
+                if (prevIndex >= start){   
+                    int window = i-start;
+                    
+                    if ( window > ans ){
+                        ans = window;
+                    }
+                    
+                    start = prevIndex+1;
+                }
+                charIndex.put(s.charAt(i),i);
+            }
+            i++;
+        }
+        
+         if (s.length()-start > ans ){
+             ans = s.length()-start;
+         }
+        
+        return ans;
+    }
+}
+```

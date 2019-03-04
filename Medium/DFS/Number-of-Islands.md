@@ -16,7 +16,9 @@ Output: 1
 
 ## Coding
 Time: O(n); Go through all coordinates once.<br>
-Space: O(1) No additional space used.
+Space: O(1) No additional space used.<br>
+
+python version
 ```python
 class Solution:
     def numIslands(self, grid):
@@ -48,6 +50,8 @@ class Solution:
                 
         return cnt
 ```
+
+java version:
 ```java
 class Solution {
     public int numIslands(char[][] grid) {

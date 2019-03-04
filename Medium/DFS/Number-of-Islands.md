@@ -17,7 +17,7 @@ Output: 1
 ## Coding
 Time: O(n); Go through all coordinates once.<br>
 Space: O(1) No additional space used.
-```python3
+```python
 class Solution:
     def numIslands(self, grid):
         """
@@ -48,4 +48,50 @@ class Solution:
                 
         return cnt
 ```
+```java
+class Solution {
+    public int numIslands(char[][] grid) {
+        int islandCount = 0;
 
+        if (grid.length == 0 || grid[0].length == 0){
+            return 0;
+        }
+
+        for (int i=0; i<grid.length; i++){
+            for (int j=0; j<grid[0].length; j++){
+                if (grid[i][j] =='1'){
+                    this.walkIsland(grid, i, j);
+                    islandCount+=1;
+                }
+            }
+        }
+        return islandCount;
+    }
+
+    public void walkIsland(char[][] grid, int i, int j){
+        if (grid[i][j] == '0' || grid[i][j] == '2'){
+            grid[i][j] = '2';
+            return;
+        }
+
+        grid[i][j] = '2';
+
+        if(i-1>=0 && grid[i-1][j]=='1'){
+            this.walkIsland(grid, i-1, j);
+        }
+        if(j-1>=0 && grid[i][j-1]=='1'){
+            this.walkIsland(grid, i, j-1);
+        }
+        if(i+1<grid.length && grid[i+1][j]=='1'){
+            this.walkIsland(grid, i+1, j);
+        }
+        if(j+1<grid[0].length && grid[i][j+1]=='1'){
+            this.walkIsland(grid, i, j+1);
+        }
+
+
+    }
+
+
+}
+```

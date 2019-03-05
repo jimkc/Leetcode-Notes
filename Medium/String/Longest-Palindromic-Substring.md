@@ -16,8 +16,10 @@ Output: "bb"
 
 ## Coding
 Time: O(n^2) Compareing the words takes O(n); <br>
-Space: O(1)
-```python3
+Space: O(1)<br>
+
+python3 version:
+```python
 class Solution:
     def longestPalindrome(self, s):
         """
@@ -40,4 +42,39 @@ class Solution:
                 
 
         return s[start_point : start_point + max_len]
+```
+
+java version:
+```java
+class Solution {
+    public String longestPalindrome(String s) {
+        int[] range  = new int[]{0,0};
+
+        if (s.length() == 0){
+            return "";
+        }
+
+        for(int i=0; i<s.length(); i++){
+            this.extendPalindrome(s, i, i, range);
+            this.extendPalindrome(s, i, i+1, range);
+        }
+        return s.substring(range[0], range[1]+1);
+    }
+
+    public void extendPalindrome(String s, int l, int r, int[] range){
+
+        while(l>=0 && r <= s.length()-1 && s.charAt(l)==s.charAt(r)){
+            l--;
+            r++;
+        }
+        l++;
+        r--;
+
+        if(r-l+1 > range[1]-range[0]+1){
+            range[0] = l;
+            range[1] = r;
+
+        }
+    }
+}
 ```

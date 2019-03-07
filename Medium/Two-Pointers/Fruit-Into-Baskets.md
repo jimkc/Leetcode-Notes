@@ -39,6 +39,8 @@ If we started at the first tree or the eighth tree, we would only collect 4 frui
 
 ## Thinking
 Aproach 1 in the solution.
+1. Since we want consequtive of fruit types we can first create a cnt array to record consequtive subsequeces length as item.<br>
+2. Use a set to help checking there is always 2 types in the current length.
 
 ## Coding
 Time: O(n);  </br>

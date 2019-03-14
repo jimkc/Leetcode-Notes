@@ -24,7 +24,7 @@ numbers we have walked through before, if -(nums[i]+nums[j]) is in seen, then we
 ## Coding
 Time: O(n^2);<br>
 Space: O(n^2)
-```python3
+```python
 class Solution:
     def threeSum(self, nums):
         """

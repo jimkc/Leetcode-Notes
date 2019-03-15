@@ -44,16 +44,17 @@ class RLEIterator:
         
 
     def next(self, n: int) -> int:
+    	
         while self.idx < len(self.A) and n > self.A[self.idx]:
-            n -= self.A[self.idx] # remainder 
-            self.idx += 2
+            n -= self.A[self.idx] # remainder for the current round
+            self.idx += 2 # the index in the next round
         
 
         if self.idx >= len(self.A):
             return -1
                
         # second condition doesnt satisfy (n <= self.A[self.idx+1])
-        self.A[self.idx] = self.A[self.idx]-n # change in the next 
+        self.A[self.idx] = self.A[self.idx]-n # update the remain value that hasn't run through
         return self.A[self.idx+1]
             
 

@@ -30,7 +30,7 @@ but the second term did not exist.  Since the last term exhausted does not exist
 ## Thinking
 When ever we try to move on to the next element we check 2 things.<br>
 1. Does the new index run out of range ? <br>
-2. Is the current value in A[idx] enough for n values?
+2. Is the current value in A[new index] smaller than n value?
 
 ## Coding
 Time: O();  </br>
@@ -44,6 +44,7 @@ class RLEIterator:
         
 
     def next(self, n: int) -> int:
+
     	
         while self.idx < len(self.A) and n > self.A[self.idx]:
             n -= self.A[self.idx] # remainder for the current round

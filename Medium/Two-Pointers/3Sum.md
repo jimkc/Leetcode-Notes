@@ -24,7 +24,9 @@ numbers we have walked through before, if -(nums[i]+nums[j]) is in seen, then we
 
 ## Coding
 Time: O(n^2);<br>
-Space: O(n^2)
+Space: O(n^2)<br>
+
+python3 version:
 ```python
 class Solution:
     def threeSum(self, nums):
@@ -57,6 +59,8 @@ class Solution:
         
         return  (list(map(list,ans)))
 ```
+
+java version:<br>
 ```java
 class Solution {
     public List<List<Integer>> threeSum(int[] numbers) {

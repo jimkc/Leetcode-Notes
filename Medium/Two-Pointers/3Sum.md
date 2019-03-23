@@ -17,9 +17,10 @@ A solution set is:
 </pre>
 
 ## Thinking
-This question is similar to 3Sum-Closet, but implemented in  a different way.<br>
-We use i to iterate through array, and j to iterate from i+1 to last, also we record nums[i] in a set to know what kind of 
-numbers we have walked through before, if -(nums[i]+nums[j]) is in seen, then we put it in the answer.
+1.This question is similar to 3Sum-Closet, but implemented in  a different way.<br>
+2. We use i to iterate through array, and j to iterate from i+1 to last, also we record nums[i] in a set to know what kind of 
+numbers we have walked through before, if -(nums[i]+nums[j]) is in seen, then we put it in the answer.<br>
+3. Second method more concise and safe space and time with similar concept.
 
 ## Coding
 Time: O(n^2);<br>
@@ -56,4 +57,45 @@ class Solution:
         
         return  (list(map(list,ans)))
 ```
-
+```java
+class Solution {
+    public List<List<Integer>> threeSum(int[] numbers) {
+        
+        HashSet<Integer> seen = new HashSet<>();
+        Arrays.sort(numbers);
+        List<List<Integer>> ans = new ArrayList<>();
+        
+        for(int i=0; i+2<numbers.length; i++){
+            //skip the same result
+            if (i>0 && numbers[i] == numbers[i-1]){
+                continue;
+            }
+            
+            int target = -numbers[i];
+            int j = i+1;
+            int k = numbers.length-1;
+            
+            while(j<k){
+                if (numbers[j]+numbers[k] == target){
+                    ans.add(Arrays.asList(numbers[i], numbers[j], numbers[k]));
+                    j++;
+                    k--;
+                    //avoid adding same results
+                    while(j<k && numbers[j]==numbers[j-1]){j++;}
+                    while(j<k && numbers[k]==numbers[k+1]){k--;}
+                }
+                else if((numbers[j]+numbers[k])> target){
+                    k--;
+                }
+                else{
+                    j++;
+                }
+                
+                
+            }
+                
+        }
+        return ans;
+    }
+}
+```

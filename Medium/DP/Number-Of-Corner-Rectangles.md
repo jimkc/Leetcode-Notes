@@ -41,7 +41,7 @@ The number of 1s in the grid will be at most 6000.
 ## Coding
 Time: O(m*n); <br>
 Space: O(m*n^2)
-```python3
+```python
 class Solution:
     def countCornerRectangles(self, grid):
         """
@@ -64,17 +64,34 @@ class Solution:
 ```
 
 Faster one 
-```python3
+```python
 class Solution:
     def countCornerRectangles(self, grid):
-        ret = 0
-        prevs = [] # Record each idx that is one for each previous rows
-        for row in grid:
-            ones = {idx for idx, val in enumerate(row) if val}
-            for prev in prevs:
-                matches = len(ones & prev)
-                ret += matches * (matches - 1) // 2 # Use math calculation to count the matches idx with one in previous
-            prevs.append(ones)
+        """
+        :type grid: List[List[int]]
+        :rtype: int
+        """
+        ans = 0
+        dp_sets = [] # every row stores set of columns
         
-        return ret
+        for row in range(len(grid)):
+            dp_sets.append(set([col for col,val in enumerate(grid[row]) if val==1]))
+            for prev_row in range(row):
+                matches = self.match_two_rows(dp_sets[row], dp_sets[prev_row])
+                # match actually can use python built in function &
+                # matches = len(dp_sets[row] & dp_sets[prev_rows])
+                if matches > 0:
+                    ans += matches*(matches-1)//2 # choose 2 among n items
+        return ans
+    
+    def match_two_rows(self,row1, row2):
+        match = 0
+        for col in row1:
+            if col in row2:
+                match +=1
+        return match            
+    
+        
+        
+                    
 ```

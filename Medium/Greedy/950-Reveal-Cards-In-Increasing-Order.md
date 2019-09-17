@@ -34,6 +34,7 @@ Since all the cards revealed are in increasing order, the answer is correct.
 A[i] != A[j] for all i != j<br>
 
 ## Thinking
+Simulate the revealing process (simulate with index) with a deck set to [0, 1, 2, ...]. If for example this deck is revealed in the order [0, 2, 4, ...] then we know we need to put the smallest card in index 0, the second smallest card in index 2, the third smallest card in index 4, etc.
 
 
 ## Coding
@@ -52,6 +53,5 @@ class Solution:
             if index:
                 index.append(index.popleft())
         return ans
-                
 ```
 

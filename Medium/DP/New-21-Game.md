@@ -46,7 +46,7 @@ class Solution:
         # dp[i] = dp[i-W]*1/W + dp[i-W-1]*1/W +....+ dp[i-1]*1/W
         # Because if we get number i-W than we can pick its complement W with probability 1/W to get sum i
         # let dp[i-W]+....dp[i-1] = wsum, the sum of i to at most previous w probabilities
-        wsum = 1
+        wsum = 1 # start with i=1, wsum = dp[0]
         for i in range(1,len(dp)):
             dp[i] = wsum/W
             # if the number < K and in window W , there is a chance it can add 1 number to exceed K

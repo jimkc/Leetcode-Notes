@@ -38,9 +38,6 @@ If we have A[k] * 2 != A[i] + A[j],<br>
 
 E.g: [1,3,2] * 2 = [2,6,4]<br>
 
-
-只要一邊都是已經beautiful的奇數array一邊是已經beautiful的偶數array，因為基數＋偶數 = 基數 ！＝ A[k]X2所以merge再一起會成立
-
 ## Coding
 Time: O(nlogn); <br>
 Space: O(1)

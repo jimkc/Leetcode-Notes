@@ -22,6 +22,7 @@ Assume we are dealing with an environment which could only store integers within
 假設a是被除數，b是除數，每次a都除以b乘以2的i次方，因為最多32位元所以最多只會除32次。<br>
 從a的最左邊位數開始看，想像用手遮住右邊的bits，每次只看最左32-i個，如果夠減b帶表b<< i 超過目前a的值的一半，所以當我們扣掉b<< i時不用擔心下次相減a的最左邊的有數字位數會不會比b的最左邊有數字位數少，因為一但少了代表a現在的值不到b了所以之後都不會讓ans＋。<br>
 另外b<< i 其實就是b＊2^i＝b＊（1<< i），所以ans才是加那樣  
+所有數都可以拆解成 n*2^i + k*2^0
 
 ## Coding
 Time: O(nlogn); binary division <br>
@@ -44,7 +45,7 @@ class Solution:
             if (a >> i) - b >= 0:
                 # because binary are always 1 and 0, so if >=0, means the largest bit is 1-0 or 1-1
                 ans += 1<<i
-                a -= b << i
+                a -= b << i 
         return ans if (dividend > 0) == (divisor > 0) else -ans
 ```
 

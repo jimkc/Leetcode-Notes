@@ -58,7 +58,7 @@ Could you do better than O(n2) per move() operation?
 ## Coding
 Time: O(n); <br>
 Space: O(n^2)
-```python3
+```python
 class TicTacToe:
 
     def __init__(self, n):

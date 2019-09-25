@@ -36,7 +36,7 @@ The number of keys in all rooms combined is at most 3000.
 ## Coding
 Time: O(n) n for nums in list;<br>
 Space: O(n)
-```python3
+```python
 class Solution:
     def canVisitAllRooms(self, rooms):
         """
@@ -58,7 +58,7 @@ class Solution:
             nxt_room = key
             # Check if loop happens
             if (cur_room, nxt_room) in seen:
-                return 
+                continue 
             else:
                 seen.add((cur_room, nxt_room))
                 
@@ -68,8 +68,10 @@ class Solution:
     
 ```
 
-Clean code:
-```python3
+Clean code:<br>
+Time: O(k) go through all keys;<br>
+Space: O(k)
+```python
 def canVisitAllRooms(self, rooms):
         dfs = [0]
         seen = set(dfs)
@@ -79,6 +81,6 @@ def canVisitAllRooms(self, rooms):
                 if j not in seen:
                     dfs.append(j)
                     seen.add(j)
-                    if len(seen) == len(rooms): return True
+                    if len(seen) == len(rooms): return True # this line can be add or remove, depends
         return len(seen) == len(rooms)
 ```

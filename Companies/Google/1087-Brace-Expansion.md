@@ -56,6 +56,13 @@ class Solution:
                 
         return sorted(ans)
                 
-                
+
+```
+
+```python
+def permute(self, S):
+        A = S.replace('{', ' ').replace('}', ' ').strip().split(' ')
+        B = [sorted(a.split(',')) for a in A]
+        return [''.join(c) for c in itertools.product(*B)]
 ```
 

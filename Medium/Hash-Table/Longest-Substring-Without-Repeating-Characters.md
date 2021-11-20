@@ -45,41 +45,31 @@ class Solution:
 ```
 
 
+
+
 java version:
 ```java
 class Solution {
     public int lengthOfLongestSubstring(String s) {
-        Map<Character, Integer> charIndex = new HashMap<>();
+        int n = s.length();
         int ans = 0;
-        int start = 0;
-        int i=0;
+        Map<Character, Integer> indexMap = new HashMap<>(); // current index
         
-        while(i<s.length()){
-            if(charIndex.containsKey(s.charAt(i))==false){
-                charIndex.put(s.charAt(i), i);
-            }
-            else{
-                
-                int prevIndex = charIndex.get(s.charAt(i));
-                
-                if (prevIndex >= start){   
-                    int window = i-start;
-                    
-                    if ( window > ans ){
-                        ans = window;
-                    }
-                    
-                    start = prevIndex+1;
+        for(int i=0, j=0; j<n; j++)
+        {
+            char c = s.charAt(j);
+            if(indexMap.containsKey(c))
+            {
+                // the dupicate of c is in the sliding window
+                if(i <= indexMap.get(c))
+                {
+                    i = indexMap.get(c)+1;
                 }
-                charIndex.put(s.charAt(i),i);
             }
-            i++;
+            
+            ans = Math.max(ans, j-i+1);
+            indexMap.put(c, j);
         }
-        
-         if (s.length()-start > ans ){
-             ans = s.length()-start;
-         }
-        
         return ans;
     }
 }

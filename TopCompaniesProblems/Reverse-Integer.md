@@ -22,7 +22,8 @@ Assume we are dealing with an environment which could only store integers within
 ## Coding
 Time: O(n);<br>
 Space: O(1)
-```python3
+
+```python
 class Solution:
     def reverse(self, x):
         """
@@ -43,3 +44,31 @@ class Solution:
         return rev
 ```
 
+###Solution 2
+Algorithm
+
+Reversing an integer can be done similarly to reversing a string.<br>
+
+We want to repeatedly "pop" the last digit off of x and "push" it to the back of the rev. In the end, rev will be the reverse of the x.<br>
+
+To "pop" and "push" digits without the help of some auxiliary stack/array, we can use math.<br>
+
+Time: `O(log(x))`. There are roughly log(x) digits in x.<br>
+Space: `O(1)`.
+
+```Java
+class Solution {
+    public int reverse(int x) {
+        int rev = 0;
+        while(x != 0)
+        {
+            int pop = x % 10;
+            x /= 10;
+            if(rev > Integer.MAX_VALUE/10 || (rev == Integer.MAX_VALUE/10 && pop > 7)) return 0;
+            if(rev < Integer.MIN_VALUE/10 || (rev == Integer.MIN_VALUE/10 && pop < -8)) return 0;
+            rev = rev*10 + pop;
+        }
+        return rev;
+    }
+}
+```

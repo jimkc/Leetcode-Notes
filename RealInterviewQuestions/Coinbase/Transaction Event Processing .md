@@ -431,3 +431,244 @@ public class OrderProcessor {
     // ... getOrderStatus and processEvents methods remain the same ...
 }
 ```
+
+Test case for Level 2
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+        OrderProcessor processor = new OrderProcessor();
+
+        // Level 2 Example 1: Successful Cancellation
+        List<Event> events1 = new ArrayList<>();
+        events1.add(new Event(1111, "BUY", "BTC", 20, 100.0, EventType.NEW));
+        events1.add(new Event(1111, "BUY", "BTC", 5, 100.0, EventType.FILLED)); // Partially filled
+        events1.add(new Event(1111, "BUY", "BTC", 0, 0.0, EventType.CANCEL)); // Amount/price often irrelevant for CANCEL
+        processor.processEvents(events1);
+        System.out.println("Order 1111 Status: " + processor.getOrderStatus(1111)); // Expected: CANCELED
+        System.out.println("---");
+
+        // Level 2 Example 2: Cancellation of a NEW order
+        List<Event> events2 = new ArrayList<>();
+        events2.add(new Event(2222, "SELL", "ETH", 10, 2000.0, EventType.NEW));
+        events2.add(new Event(2222, "SELL", "ETH", 0, 0.0, EventType.CANCEL));
+        processor.processEvents(events2);
+        System.out.println("Order 2222 Status: " + processor.getOrderStatus(2222)); // Expected: CANCELED
+        System.out.println("---");
+
+        // Level 2 Example 3: Attempt to cancel a COMPLETED order (should be ignored)
+        List<Event> events3 = new ArrayList<>();
+        events3.add(new Event(3333, "BUY", "LTC", 10, 50.0, EventType.NEW));
+        events3.add(new Event(3333, "BUY", "LTC", 10, 50.0, EventType.FILLED)); // Completed
+        events3.add(new Event(3333, "BUY", "LTC", 0, 0.0, EventType.CANCEL));
+        processor.processEvents(events3);
+        System.out.println("Order 3333 Status: " + processor.getOrderStatus(3333)); // Expected: COMPLETED
+        System.out.println("---");
+
+        // Level 2 Example 4: Filling a CANCELED order (should be ignored)
+        List<Event> events4 = new ArrayList<>();
+        events4.add(new Event(4444, "BUY", "XYZ", 100, 10.0, EventType.NEW));
+        events4.add(new Event(4444, "BUY", "XYZ", 0, 0.0, EventType.CANCEL)); // Canceled
+        events4.add(new Event(4444, "BUY", "XYZ", 50, 10.0, EventType.FILLED)); // Should be ignored
+        processor.processEvents(events4);
+        System.out.println("Order 4444 Status: " + processor.getOrderStatus(4444)); // Expected: CANCELED
+        System.out.println("---");
+    }
+}
+```
+
+#### Level 3: Windowed Event Processing and Out-of-Order Events
+Question: We need to aggregate these events, processing them in a 5-second window. Events can come in out of order, so we need to process events in increasing timestamp order within that window. For example, if the input timestamp is 10, we process events from timestamp 6-10.
+
+1. Update Event.java: Add a timestamp field. We'll also make it Comparable so it can be easily sorted in collections (though TreeMap sorts by key, this is good practice for events).
+```java
+// Event.java (modified for Level 3)
+public class Event implements Comparable<Event> {
+    int orderId;
+    String orderType;
+    String currency;
+    double amount;
+    double price;
+    EventType eventType;
+    long timestamp; // New field: Unix timestamp in milliseconds
+
+    public Event(int orderId, String orderType, String currency, double amount, double price, EventType eventType, long timestamp) {
+        this.orderId = orderId;
+        this.orderType = orderType;
+        this.currency = currency;
+        this.amount = amount;
+        this.price = price;
+        this.eventType = eventType;
+        this.timestamp = timestamp;
+    }
+
+    // ... existing getters ...
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    @Override
+    public int compareTo(Event other) {
+        return Long.compare(this.timestamp, other.timestamp);
+    }
+
+    @Override
+    public String toString() {
+        return "Event{" +
+               "orderId=" + orderId +
+               ", eventType=" + eventType +
+               ", amount=" + amount +
+               ", timestamp=" + timestamp +
+               '}';
+    }
+}
+```
+
+2. New WindowedOrderProcessor (or modify OrderProcessor):
+```java
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.Iterator; // For safe removal during iteration
+
+public class WindowedOrderProcessor {
+    private OrderProcessor orderProcessor; // Our Level 2 processor
+    // TreeMap to store events, keyed by timestamp for sorted access
+    // Value is a list because multiple events can happen at the same timestamp
+    private TreeMap<Long, List<Event>> eventBuffer;
+    private final long WINDOW_SIZE_MS = 5000; // 5 seconds in milliseconds
+
+    public WindowedOrderProcessor() {
+        this.orderProcessor = new OrderProcessor();
+        this.eventBuffer = new TreeMap<>();
+    }
+
+    // Method to ingest new events (they go into the buffer)
+    public void ingestEvent(Event event) {
+        eventBuffer.computeIfAbsent(event.getTimestamp(), k -> new ArrayList<>()).add(event);
+        System.out.println("Ingested event: " + event);
+    }
+
+    // Processes all events within the specified time window, up to currentTimestamp
+    public void processWindow(long currentTimestamp) {
+        System.out.println("\nProcessing window up to timestamp: " + currentTimestamp);
+
+        long windowStart = currentTimestamp - WINDOW_SIZE_MS;
+
+        // Get a sub-map of events within the current window
+        // headMap(key, true) includes key, tailMap(key, true) includes key
+        // subMap(fromKey, fromInclusive, toKey, toInclusive)
+        Map<Long, List<Event>> eventsToProcess = eventBuffer.subMap(windowStart, true, currentTimestamp, true);
+
+        // Create a temporary list to hold events for processing to avoid ConcurrentModificationException
+        List<Event> orderedEventsInWindow = new ArrayList<>();
+        for (Map.Entry<Long, List<Event>> entry : eventsToProcess.entrySet()) {
+            orderedEventsInWindow.addAll(entry.getValue());
+        }
+
+        // Sort within the window if there were events with same timestamp but different order
+        // (Our current Event.java implements Comparable, but TreeMap ensures order by timestamp key)
+        // If events within the same timestamp need specific ordering (e.g., NEW before FILLED),
+        // you'd add more complex sorting here. For now, TreeMap ensures ordering by timestamp.
+
+        // Process events in timestamp order
+        for (Event event : orderedEventsInWindow) {
+            System.out.println("  Processing event: " + event);
+            orderProcessor.processEvent(event);
+        }
+
+        // Remove processed events from the buffer
+        // Use an iterator to safely remove elements while iterating
+        Iterator<Map.Entry<Long, List<Event>>> iterator = eventBuffer.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<Long, List<Event>> entry = iterator.next();
+            if (entry.getKey() <= currentTimestamp) { // Remove all events up to and including currentTimestamp
+                iterator.remove();
+            } else {
+                // Since TreeMap is sorted, once we hit an event outside the window,
+                // all subsequent events are also outside.
+                break;
+            }
+        }
+        System.out.println("Finished processing window. Remaining events in buffer: " + eventBuffer.size());
+    }
+
+    // Returns the status from the underlying OrderProcessor
+    public OrderStatus getOrderStatus(int orderId) {
+        return orderProcessor.getOrderStatus(orderId);
+    }
+}
+```
+
+How to Implement:  
+* Keep Level 1 & 2 files: Make sure you have Event.java (modified with timestamp), EventType.java, OrderStatus.java, Order.java, and OrderProcessor.java in your project.
+* Create WindowedOrderProcessor.java: Add this new file.
+* Use the WindowedOrderProcessor:
+
+Test case:
+```java
+import java.util.concurrent.TimeUnit; // For simulating time progression
+
+public class Main {
+    public static void main(String[] args) throws InterruptedException {
+        WindowedOrderProcessor windowProcessor = new WindowedOrderProcessor();
+
+        // Simulate events arriving out of order and at different times
+
+        // Time 1000ms
+        windowProcessor.ingestEvent(new Event(100, "BUY", "BTC", 10, 100.0, EventType.NEW, 1000));
+        windowProcessor.ingestEvent(new Event(200, "SELL", "ETH", 5, 2000.0, EventType.NEW, 1000));
+
+        // Time 2000ms - an early fill for order 100, and a new order 300
+        windowProcessor.ingestEvent(new Event(100, "BUY", "BTC", 3, 100.0, EventType.FILLED, 2000));
+        windowProcessor.ingestEvent(new Event(300, "BUY", "LTC", 20, 50.0, EventType.NEW, 2000));
+
+        // Time 4000ms - a cancellation, and another fill for order 100
+        windowProcessor.ingestEvent(new Event(300, "BUY", "LTC", 0, 0.0, EventType.CANCEL, 4000));
+        windowProcessor.ingestEvent(new Event(100, "BUY", "BTC", 2, 100.0, EventType.FILLED, 4000));
+
+        // Time 6000ms - a late event for order 100, and a fill for order 200
+        windowProcessor.ingestEvent(new Event(100, "BUY", "BTC", 5, 100.0, EventType.FILLED, 6000)); // Will complete order 100 now (3+2+5=10)
+        windowProcessor.ingestEvent(new Event(200, "SELL", "ETH", 2, 2000.0, EventType.FILLED, 6000));
+
+        // Time 5000ms - an event that arrived "late" but has an earlier timestamp
+        windowProcessor.ingestEvent(new Event(100, "BUY", "BTC", 0, 0.0, EventType.CANCEL, 500)); // Should be ignored because order 100 gets filled later
+        windowProcessor.ingestEvent(new Event(400, "SELL", "DOGE", 100, 0.5, EventType.NEW, 5000));
+
+
+        // --- Simulation of time progressing and processing windows ---
+
+        // Let's simulate processing at different time points
+        // First window at 4500ms: should process events from 0-4500
+        TimeUnit.MILLISECONDS.sleep(100); // Simulate a small delay
+        windowProcessor.processWindow(4500); // Processes events up to 4500ms
+
+        System.out.println("Order 100 Status after 4500ms window: " + windowProcessor.getOrderStatus(100)); // Expected: IN_PROCESS (3+2=5 filled, initial 10)
+        System.out.println("Order 200 Status after 4500ms window: " + windowProcessor.getOrderStatus(200)); // Expected: NEW
+        System.out.println("Order 300 Status after 4500ms window: " + windowProcessor.getOrderStatus(300)); // Expected: CANCELED
+        System.out.println("Order 400 Status after 4500ms window: " + windowProcessor.getOrderStatus(400)); // Expected: NEW
+        System.out.println("---");
+
+
+        // Next window at 7000ms: should process events from 4501-7000 (specifically, 5000, 6000)
+        TimeUnit.MILLISECONDS.sleep(100);
+        windowProcessor.processWindow(7000);
+
+        System.out.println("Order 100 Status after 7000ms window: " + windowProcessor.getOrderStatus(100)); // Expected: COMPLETED (5+5=10 filled)
+        System.out.println("Order 200 Status after 7000ms window: " + windowProcessor.getOrderStatus(200)); // Expected: IN_PROCESS (2 filled)
+        System.out.println("Order 400 Status after 7000ms window: " + windowProcessor.getOrderStatus(400)); // Expected: NEW
+        System.out.println("---");
+
+        // What if we try to cancel order 100 now, but it was already completed in the previous window?
+        windowProcessor.ingestEvent(new Event(100, "BUY", "BTC", 0, 0.0, EventType.CANCEL, 8000));
+        TimeUnit.MILLISECONDS.sleep(100);
+        windowProcessor.processWindow(8000);
+        System.out.println("Order 100 Status after 8000ms window: " + windowProcessor.getOrderStatus(100)); // Expected: COMPLETED (cancel ignored)
+        System.out.println("---");
+    }
+}
+```

@@ -1,335 +1,394 @@
 ###Problem
 
 Link: https://www.1point3acres.com/bbs/thread-1130360-1-1.html
+https://www.1point3acres.com/bbs/thread-1133037-1-1.html
 
-你需要設計並實作一個記憶體中的 key–field–value 資料庫。系統將逐步擴充，從基本 CRUD 功能進化到支援 TTL、時間戳查詢以及備份/還原功能。每個 Level 都要與之前相容。
+### Level 1: In-Memory Database with Basic Operations
+For Level 1, we'll focus on implementing SET, CompareAndSet, and Get.
 
-
-###Level 1 – Basic CRUD API
-####Problem
-Requirements
-* 支援基本的插入與讀取操作。
-* 每個 key 可對應多個 field，但每個 field 只有一個 value。
-* 資料存放於記憶體中，應能在常數或接近常數時間內存取。
-
-
-API:
 ```java
-def set(key: str, field: str, value: str):
-    """Store the given value for the specified key and field."""
-    pass
+import java.util.HashMap; // Using HashMap
+import java.util.TreeMap; // For Level 4: Equivalent to ConcurrentSkipListMap for single-threaded scenario
+import java.util.Map;
+import java.util.SortedMap; // To specify return type for SCAN for Level 2
 
-def get(key: str, field: str) -> Optional[str]:
-    """Retrieve the value for the given key and field, or None if not found."""
-    pass
-
-```
-
-Example:  
-```java
-set("user1", "name", "Alice")
-get("user1", "name")  # "Alice"
-get("user1", "age")   # None
-```
-
-####Solution
-```java
-import java.util.*;
-
-public class InMemoryDB {
-    // 資料結構: key -> field -> value
-    private Map<String, Map<String, String>> db;
-
-    public InMemoryDB() {
-        db = new HashMap<>();
-    }
-
-    public void set(String key, String field, String value) {
-        db.computeIfAbsent(key, k -> new HashMap<>()).put(field, value);
-    }
-
-    public String get(String key, String field) {
-        return db.containsKey(key) ? db.get(key).getOrDefault(field, null) : null;
-    }
-}
-```
-
-Level 1 說明
-* 使用 HashMap 實現 O(1) 查找。
-* 支援 set() 與 get()，類似 Redis 的 hash 資料結構。
-
-###Level 2 – Scanning Support
-####Problem
-Requirements
-* 回傳指定 key 底下所有的 field–value pair。
-* 支援依 field 前綴過濾。
-
-API:
-```java
-def scan(key: str) -> List[str]:
-    """Return all field-value pairs for a key in 'field(value)' format."""
-    pass
-
-def scan_with_prefix(key: str, prefix: str) -> List[str]:
-    """Return only field-value pairs where the field starts with the given prefix."""
-    pass
-
-```
-
-Example:
-```java
-set("user1", "name", "Alice")
-set("user1", "age", "30")
-scan("user1")  # ["name(Alice)", "age(30)"]
-
-set("user2", "nickname", "Al")
-set("user2", "name", "Alice")
-scan_with_prefix("user2", "name")  # ["name(Alice)"]
-scan_with_prefix("user2", "x")     # []
-```
-
-####Solution
-```java
-public List<String> scan(String key) {
-    if (!db.containsKey(key)) return new ArrayList<>();
-    List<String> result = new ArrayList<>();
-    for (Map.Entry<String, String> entry : db.get(key).entrySet()) {
-        result.add(entry.getKey() + "(" + entry.getValue() + ")");
-    }
-    return result;
-}
-
-public List<String> scanWithPrefix(String key, String prefix) {
-    if (!db.containsKey(key)) return new ArrayList<>();
-    List<String> result = new ArrayList<>();
-    for (Map.Entry<String, String> entry : db.get(key).entrySet()) {
-        if (entry.getKey().startsWith(prefix)) {
-            result.add(entry.getKey() + "(" + entry.getValue() + ")");
-        }
-    }
-    return result;
-}
-```
-
-Level 2 說明
-* scan() 回傳該 key 下所有的 field(value)。
-* scanWithPrefix() 支援 field 的 prefix 過濾。
-
-###Level 3 – Timestamp & TTL Support
-####Problem
-Requirements
-* 支援帶 timestamp 的插入操作。
-* 支援 TTL（Time‑To‑Live）：資料會在 timestamp + ttl 時過期，當「當前時間 == timestamp + ttl」即視為過期。
-* 時間由傳入的 timestamp 模擬，且保證不倒退。
-
-API:
-```java
-def set_at(key: str, field: str, value: str, timestamp: int):
-    """Insert a record with the specified timestamp."""
-    pass
-
-def set_with_ttl(key: str, field: str, value: str, timestamp: int, ttl: int):
-    """Insert a record that expires at timestamp + ttl."""
-    pass
-
-def get_at(key: str, field: str, timestamp: int) -> Optional[str]:
-    """Return the value only if it hasn't expired. Return None if not found or expired."""
-    pass
-
-def scan_at(key: str, timestamp: int) -> List[str]:
-    """Return all non-expired field-value pairs for a key at a given timestamp."""
-    pass
-
-def scan_with_prefix_at(key: str, prefix: str, timestamp: int) -> List[str]:
-    """Like scan_with_prefix but only for non-expired records."""
-    pass
-```
-
-Example:
-```java
-set_at("user3", "status", "active", 100)
-get_at("user3", "status", 101)  # "active"
-get_at("user3", "status", 99)   # None
-
-set_with_ttl("user4", "code", "XYZ", 100, 5)
-get_at("user4", "code", 104)    # "XYZ"
-get_at("user4", "code", 105)    # None
-
-scan_at("user3", 101)  # ["status(active)"]
-scan_at("user3", 99)   # []
-```
-
-####Solution
-```java
+// Represents a single data entry (field-value pair with metadata)
 class Record {
-    String value;
-    int timestamp; // 設定時間
-    Integer ttl;   // null 表示無 TTL
+    private String value;
+    private int timestamp;
+    private long expirationTime; // For Level 3: System.currentTimeMillis() + TTL
 
-    public Record(String value, int timestamp, Integer ttl) {
+    public Record(String value, int timestamp) {
         this.value = value;
         this.timestamp = timestamp;
-        this.ttl = ttl;
+        this.expirationTime = -1; // -1 indicates no TTL for now
     }
 
-    public boolean isExpired(int now) {
-        return ttl != null && now >= timestamp + ttl;
+    public Record(String value, int timestamp, long expirationTime) {
+        this.value = value;
+        this.timestamp = timestamp;
+        this.expirationTime = expirationTime;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public int getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(int timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public long getExpirationTime() {
+        return expirationTime;
+    }
+
+    public void setExpirationTime(long expirationTime) {
+        this.expirationTime = expirationTime;
+    }
+
+    // For debugging and clear output
+    @Override
+    public String toString() {
+        return "Record{" +
+               "value='" + value + '\'' +
+               ", timestamp=" + timestamp +
+               ", expirationTime=" + expirationTime +
+               '}';
     }
 }
-```
-更新資料結構並擴充函式
-```java
-private Map<String, Map<String, Record>> timedDb = new HashMap<>();
 
-public void setAt(String key, String field, String value, int timestamp) {
-    timedDb.computeIfAbsent(key, k -> new HashMap<>())
-           .put(field, new Record(value, timestamp, null));
-}
+public class InMemoryDatabase {
 
-public void setWithTtl(String key, String field, String value, int timestamp, int ttl) {
-    timedDb.computeIfAbsent(key, k -> new HashMap<>())
-           .put(field, new Record(value, timestamp, ttl));
-}
+    // Structure: key -> (field -> Record)
+    private HashMap<String, HashMap<String, Record>> dataStore;
 
-public String getAt(String key, String field, int timestamp) {
-    if (!timedDb.containsKey(key)) return null;
-    Record rec = timedDb.get(key).get(field);
-    if (rec == null || rec.timestamp > timestamp || rec.isExpired(timestamp)) return null;
-    return rec.value;
-}
+    // For Level 4: key -> (field -> (timestamp -> value))
+    private HashMap<String, HashMap<String, TreeMap<Integer, String>>> historicalDataStore;
 
-public List<String> scanAt(String key, int timestamp) {
-    List<String> result = new ArrayList<>();
-    if (!timedDb.containsKey(key)) return result;
-    for (Map.Entry<String, Record> entry : timedDb.get(key).entrySet()) {
-        Record rec = entry.getValue();
-        if (!rec.isExpired(timestamp) && rec.timestamp <= timestamp) {
-            result.add(entry.getKey() + "(" + rec.value + ")");
+    public InMemoryDatabase() {
+        this.dataStore = new HashMap<>();
+        this.historicalDataStore = new HashMap<>(); // Initialize for Level 4 readiness
+    }
+
+    // Level 1: SET operation
+    public void SET(int timestamp, String key, String field, String value) {
+        Record newRecord = new Record(value, timestamp);
+        // Using computeIfAbsent for cleaner code and handling new keys/fields
+        dataStore.computeIfAbsent(key, k -> new HashMap<>()).put(field, newRecord);
+
+        // Store value for historical look-back (Level 4)
+        historicalDataStore.computeIfAbsent(key, k -> new HashMap<>())
+                           .computeIfAbsent(field, f -> new TreeMap<>()) // TreeMap for sorting by timestamp
+                           .put(timestamp, value);
+    }
+
+    // Level 1: CompareAndSet operation
+    public boolean CompareAndSet(int timestamp, String key, String field, String expectValue, String newValue) {
+        HashMap<String, Record> fields = dataStore.get(key);
+        if (fields == null) {
+            return false; // Key does not exist
         }
-    }
-    return result;
-}
 
-public List<String> scanWithPrefixAt(String key, String prefix, int timestamp) {
-    List<String> result = new ArrayList<>();
-    if (!timedDb.containsKey(key)) return result;
-    for (Map.Entry<String, Record> entry : timedDb.get(key).entrySet()) {
-        Record rec = entry.getValue();
-        if (entry.getKey().startsWith(prefix) && !rec.isExpired(timestamp) && rec.timestamp <= timestamp) {
-            result.add(entry.getKey() + "(" + rec.value + ")");
+        Record currentRecord = fields.get(field);
+        if (currentRecord == null || !currentRecord.getValue().equals(expectValue)) {
+            return false; // Field does not exist or expectValue does not match
         }
+
+        // Replace the record if the value matches expectValue
+        Record updatedRecord = new Record(newValue, timestamp);
+        // Note: HashMap's replace method (with oldValue) is not atomic for concurrent access
+        // but works for single-threaded or external synchronization.
+        fields.put(field, updatedRecord); // Simple put overwrites, assumes currentRecord check is enough for logic
+
+        // Store new value for historical look-back (Level 4)
+        historicalDataStore.computeIfAbsent(key, k -> new HashMap<>())
+                           .computeIfAbsent(field, f -> new TreeMap<>())
+                           .put(timestamp, newValue);
+        return true; // We successfully performed the logical CAS
     }
-    return result;
-}
-```
 
-Level 3 說明
-* Record 包含 timestamp 和 ttl，支援過期邏輯。
-* 所有查詢都用傳入的 timestamp 模擬系統時間。
-
-###Level 4 – Backup and Restore
-####Problem
-Requirements
-* 支援在指定 timestamp 時備份整個資料庫狀態。
-* 支援還原到最接近且 ≤ timestamp 的最近一次備份。
-
-
-API:
-```java
-def backup(timestamp: int)
-    """Create a full snapshot of the database at the given timestamp.
-    pass
-
-def restore(timestamp: int):
-    """Restore the database to the latest backup at or before the given timestamp."""
-    pass
-```
-
-Example:
-```java
-set("app", "version", "1.0")
-backup(300)
-set("app", "version", "2.0")
-restore(300)
-get("app", "version")  # "1.0"
-```
-
-####Solution
-```java
-private TreeMap<Integer, Map<String, Map<String, Record>>> backups = new TreeMap<>();
-
-public void backup(int timestamp) {
-    // 深拷貝整個資料庫
-    Map<String, Map<String, Record>> snapshot = new HashMap<>();
-    for (String key : timedDb.keySet()) {
-        Map<String, Record> inner = new HashMap<>();
-        for (Map.Entry<String, Record> entry : timedDb.get(key).entrySet()) {
-            Record r = entry.getValue();
-            inner.put(entry.getKey(), new Record(r.value, r.timestamp, r.ttl));
+    // Level 1: Get operation
+    public String Get(int time, String key, String field) {
+        HashMap<String, Record> fields = dataStore.get(key);
+        if (fields == null) {
+            return null; // Key does not exist
         }
-        snapshot.put(key, inner);
+        Record record = fields.get(field);
+        return record != null ? record.getValue() : null;
     }
-    backups.put(timestamp, snapshot);
-}
 
-public void restore(int timestamp) {
-    Integer floor = backups.floorKey(timestamp);
-    if (floor == null) return;
-    Map<String, Map<String, Record>> backup = backups.get(floor);
-    
-    // 同樣要深拷貝以避免未來修改
-    Map<String, Map<String, Record>> copy = new HashMap<>();
-    for (String key : backup.keySet()) {
-        Map<String, Record> inner = new HashMap<>();
-        for (Map.Entry<String, Record> entry : backup.get(key).entrySet()) {
-            Record r = entry.getValue();
-            inner.put(entry.getKey(), new Record(r.value, r.timestamp, r.ttl));
+    // Level 1: CAD (Compare and check if expectValue matches current value)
+    public boolean CAD(int timestamp, String key, String field, String expectValue) {
+        HashMap<String, Record> fields = dataStore.get(key);
+        if (fields == null) {
+            return false; // Key does not exist
         }
-        copy.put(key, inner);
+        Record record = fields.get(field);
+        return record != null && expectValue.equals(record.getValue());
     }
-    timedDb = copy;
 }
-
 ```
 
-Level 4 說明
-* 使用 TreeMap 來找小於等於的時間點做備份還原。
-* 用深拷貝避免之後的修改影響備份。
+### Level 2: Display Records Based on Filters
+For Level 2, we'll implement SCAN and ScanByPrefix. Both operations will retrieve field-value pairs for a given key, with ScanByPrefix adding a filter for field names. The results need to be sorted by field in lexicographical order.
 
-###Test cases
+
 ```java
-public static void main(String[] args) {
-    InMemoryDB db = new InMemoryDB();
+import java.util.HashMap;
+import java.util.TreeMap; // For Level 4: Equivalent to ConcurrentSkipListMap for single-threaded scenario
+import java.util.Map;
+import java.util.SortedMap; // To specify return type for SCAN for Level 2
+import java.util.stream.Collectors; // For stream operations
 
-    // Level 1
-    db.set("user1", "name", "Alice");
-    System.out.println(db.get("user1", "name")); // Alice
+// (Record class remains the same as previously defined)
 
-    // Level 2
-    db.set("user1", "age", "30");
-    System.out.println(db.scan("user1")); // [name(Alice), age(30)]
-    System.out.println(db.scanWithPrefix("user1", "na")); // [name(Alice)]
+public class InMemoryDatabase {
 
-    // Level 3
-    db.setAt("user2", "status", "active", 100);
-    System.out.println(db.getAt("user2", "status", 101)); // active
+    // Structure: key -> (field -> Record)
+    private HashMap<String, HashMap<String, Record>> dataStore;
 
-    db.setWithTtl("user3", "token", "XYZ", 100, 5);
-    System.out.println(db.getAt("user3", "token", 104)); // XYZ
-    System.out.println(db.getAt("user3", "token", 105)); // null
+    // For Level 4: key -> (field -> (timestamp -> value))
+    private HashMap<String, HashMap<String, TreeMap<Integer, String>>> historicalDataStore;
 
-    // Level 4
-    db.set("app", "version", "1.0");
-    db.backup(300);
-    db.set("app", "version", "2.0");
-    db.restore(300);
-    System.out.println(db.get("app", "version")); // 1.0
+    public InMemoryDatabase() {
+        this.dataStore = new HashMap<>();
+        this.historicalDataStore = new HashMap<>();
+    }
+
+    // Level 1 methods (re-iterated for completeness in this file block):
+    public void SET(int timestamp, String key, String field, String value) {
+        Record newRecord = new Record(value, timestamp);
+        dataStore.computeIfAbsent(key, k -> new HashMap<>()).put(field, newRecord);
+        historicalDataStore.computeIfAbsent(key, k -> new HashMap<>())
+                           .computeIfAbsent(field, f -> new TreeMap<>())
+                           .put(timestamp, value);
+    }
+
+    public boolean CompareAndSet(int timestamp, String key, String field, String expectValue, String newValue) {
+        HashMap<String, Record> fields = dataStore.get(key);
+        if (fields == null) {
+            return false;
+        }
+        Record currentRecord = fields.get(field);
+        if (currentRecord == null || !currentRecord.getValue().equals(expectValue)) {
+            return false;
+        }
+        Record updatedRecord = new Record(newValue, timestamp);
+        fields.put(field, updatedRecord);
+        historicalDataStore.computeIfAbsent(key, k -> new HashMap<>())
+                           .computeIfAbsent(field, f -> new TreeMap<>())
+                           .put(timestamp, newValue);
+        return true;
+    }
+
+    public String Get(int time, String key, String field) {
+        HashMap<String, Record> fields = dataStore.get(key);
+        if (fields == null) {
+            return null;
+        }
+        Record record = fields.get(field);
+        return record != null ? record.getValue() : null;
+    }
+
+    public boolean CAD(int timestamp, String key, String field, String expectValue) {
+        HashMap<String, Record> fields = dataStore.get(key);
+        if (fields == null) {
+            return false;
+        }
+        Record record = fields.get(field);
+        return record != null && expectValue.equals(record.getValue());
+    }
+
+    // Level 2: SCAN operation
+    public SortedMap<String, String> SCAN(int time, String key) {
+        HashMap<String, Record> fields = dataStore.get(key);
+        if (fields == null) {
+            return new TreeMap<>(); // Return an empty sorted map if key not found
+        }
+
+        // Filter out expired records (for Level 3 readiness), then map to field->value, and sort by field
+        return fields.entrySet().stream()
+                     .filter(entry -> !isExpired(entry.getValue())) // Filter for Level 3
+                     .collect(Collectors.toMap(
+                         Map.Entry::getKey,
+                         entry -> entry.getValue().getValue(),
+                         (oldValue, newValue) -> oldValue, // Merge function for duplicates (shouldn't happen with entrySet)
+                         TreeMap::new // Ensure the resulting map is sorted by key (field)
+                     ));
+    }
+
+    // Level 2: ScanByPrefix operation
+    public SortedMap<String, String> ScanByPrefix(int time, String key, String prefix) {
+        HashMap<String, Record> fields = dataStore.get(key);
+        if (fields == null) {
+            return new TreeMap<>(); // Return an empty sorted map if key not found
+        }
+
+        // Filter by prefix and expiration (Level 3), then map and sort
+        return fields.entrySet().stream()
+                     .filter(entry -> entry.getKey().startsWith(prefix)) // Filter by prefix
+                     .filter(entry -> !isExpired(entry.getValue())) // Filter for Level 3
+                     .collect(Collectors.toMap(
+                         Map.Entry::getKey,
+                         entry -> entry.getValue().getValue(),
+                         (oldValue, newValue) -> oldValue,
+                         TreeMap::new
+                     ));
+    }
+
+    // Helper for TTL (for Level 3) - initially returns false
+    private boolean isExpired(Record record) {
+        return false; // Will be implemented in Level 3
+    }
 }
 ```
 
+### Level 3: Support TTL (Time-To-Live)
+Now, let's add SetWithTTL and CASWithTTL. These operations will allow us to specify an expiration time for our records. We'll need to modify the Record class and add logic to check for expiration.
 
+```java
+// ... (previous imports and Record class)
 
+public class InMemoryDatabase {
 
+    // ... (dataStore and historicalDataStore declarations, unchanged)
 
+    public InMemoryDatabase() {
+        this.dataStore = new HashMap<>();
+        this.historicalDataStore = new HashMap<>();
+    }
 
+    // Level 1 methods (unchanged, but might be called with TTL in mind for future use):
+    public void SET(int timestamp, String key, String field, String value) {
+        Record newRecord = new Record(value, timestamp);
+        dataStore.computeIfAbsent(key, k -> new HashMap<>()).put(field, newRecord);
+        historicalDataStore.computeIfAbsent(key, k -> new HashMap<>())
+                           .computeIfAbsent(field, f -> new TreeMap<>())
+                           .put(timestamp, value);
+    }
 
+    public boolean CompareAndSet(int timestamp, String key, String field, String expectValue, String newValue) {
+        HashMap<String, Record> fields = dataStore.get(key);
+        if (fields == null) {
+            return false;
+        }
+        Record currentRecord = fields.get(field);
+        if (currentRecord == null || !currentRecord.getValue().equals(expectValue)) {
+            return false;
+        }
+        Record updatedRecord = new Record(newValue, timestamp);
+        fields.put(field, updatedRecord);
+        historicalDataStore.computeIfAbsent(key, k -> new HashMap<>())
+                           .computeIfAbsent(field, f -> new TreeMap<>())
+                           .put(timestamp, newValue);
+        return true;
+    }
+
+    public String Get(int time, String key, String field) {
+        HashMap<String, Record> fields = dataStore.get(key);
+        if (fields == null) {
+            return null;
+        }
+        Record record = fields.get(field);
+        // Important: Check for expiration here before returning!
+        if (record != null && !isExpired(record)) {
+            return record.getValue();
+        }
+        // If expired or not found, return null
+        return null;
+    }
+
+    public boolean CAD(int timestamp, String key, String field, String expectValue) {
+        HashMap<String, Record> fields = dataStore.get(key);
+        if (fields == null) {
+            return false;
+        }
+        Record record = fields.get(field);
+        // Important: Check for expiration here before returning!
+        return record != null && !isExpired(record) && expectValue.equals(record.getValue());
+    }
+
+    // Level 2 methods (unchanged, relying on updated isExpired):
+    public SortedMap<String, String> SCAN(int time, String key) {
+        HashMap<String, Record> fields = dataStore.get(key);
+        if (fields == null) {
+            return new TreeMap<>();
+        }
+        return fields.entrySet().stream()
+                     .filter(entry -> !isExpired(entry.getValue())) // Now this filter actually works
+                     .collect(Collectors.toMap(
+                         Map.Entry::getKey,
+                         entry -> entry.getValue().getValue(),
+                         (oldValue, newValue) -> oldValue,
+                         TreeMap::new
+                     ));
+    }
+
+    public SortedMap<String, String> ScanByPrefix(int time, String key, String prefix) {
+        HashMap<String, Record> fields = dataStore.get(key);
+        if (fields == null) {
+            return new TreeMap<>();
+        }
+        return fields.entrySet().stream()
+                     .filter(entry -> entry.getKey().startsWith(prefix))
+                     .filter(entry -> !isExpired(entry.getValue())) // Now this filter actually works
+                     .collect(Collectors.toMap(
+                         Map.Entry::getKey,
+                         entry -> entry.getValue().getValue(),
+                         (oldValue, newValue) -> oldValue,
+                         TreeMap::new
+                     ));
+    }
+
+    // Level 3: SET with TTL
+    public void SetWithTTL(int timestamp, String key, String field, String value, long ttlMillis) {
+        long expirationTime = System.currentTimeMillis() + ttlMillis;
+        Record newRecord = new Record(value, timestamp, expirationTime);
+        dataStore.computeIfAbsent(key, k -> new HashMap<>()).put(field, newRecord);
+
+        // Still record in historical data without TTL info for look-back
+        historicalDataStore.computeIfAbsent(key, k -> new HashMap<>())
+                           .computeIfAbsent(field, f -> new TreeMap<>())
+                           .put(timestamp, value);
+    }
+
+    // Level 3: CompareAndSet with TTL
+    public boolean CASWithTTL(int timestamp, String key, String field, String expectValue, String newValue, long ttlMillis) {
+        HashMap<String, Record> fields = dataStore.get(key);
+        if (fields == null) {
+            return false;
+        }
+
+        Record currentRecord = fields.get(field);
+        // Check for expiration of current record as well before comparing value
+        if (currentRecord == null || isExpired(currentRecord) || !currentRecord.getValue().equals(expectValue)) {
+            return false;
+        }
+
+        long expirationTime = System.currentTimeMillis() + ttlMillis;
+        Record updatedRecord = new Record(newValue, timestamp, expirationTime);
+        fields.put(field, updatedRecord); // Overwrite
+
+        // Store new value for historical look-back
+        historicalDataStore.computeIfAbsent(key, k -> new HashMap<>())
+                           .computeIfAbsent(field, f -> new TreeMap<>())
+                           .put(timestamp, newValue);
+        return true;
+    }
+
+    // Level 3 Helper: Check if a record is expired
+    private boolean isExpired(Record record) {
+        // If expirationTime is -1, it means no TTL (never expires)
+        // Otherwise, check if current time is past expirationTime
+        return record.getExpirationTime() != -1 && System.currentTimeMillis() > record.getExpirationTime();
+    }
+}
+```

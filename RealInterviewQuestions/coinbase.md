@@ -11,3 +11,4 @@ https://www.1point3acres.com/bbs/thread-1127184-1-1.html
 ###Leetcode
 * 443. String Compression
 * 588. Design In-Memory File System
+* 1169. Invalid Transactions.md

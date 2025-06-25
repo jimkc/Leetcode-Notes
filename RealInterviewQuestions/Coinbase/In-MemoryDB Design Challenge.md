@@ -392,3 +392,37 @@ public class InMemoryDatabase {
     }
 }
 ```
+
+### Level 4: Support Look-Back Operation
+Finally, Level 4: GetWhen(int timestamp, String key, String field, int timeAt). This requires us to use the historicalDataStore we've been populating.
+
+```java
+// ... (previous imports, Record class, and InMemoryDatabase class up to Level 3 methods)
+
+public class InMemoryDatabase {
+
+    // ... (dataStore and historicalDataStore declarations, all Level 1, 2, 3 methods unchanged)
+
+    // Level 4: GetWhen operation
+    public String GetWhen(int timestamp, String key, String field, int timeAt) {
+        HashMap<String, TreeMap<Integer, String>> keyHistory = historicalDataStore.get(key);
+        if (keyHistory == null) {
+            return null; // Key does not exist in history
+        }
+
+        TreeMap<Integer, String> fieldHistory = keyHistory.get(field);
+        if (fieldHistory == null) {
+            return null; // Field does not exist in history for this key
+        }
+
+        // The TreeMap stores entries sorted by timestamp.
+        // floorEntry(timeAt) returns the entry with the greatest key (timestamp)
+        // less than or equal to the given timeAt. This is exactly what we need
+        // for a "look-back" operation – the value that was current AT or BEFORE timeAt.
+        Map.Entry<Integer, String> entry = fieldHistory.floorEntry(timeAt);
+
+        // If an entry is found, return its value
+        return entry != null ? entry.getValue() : null;
+    }
+}
+```

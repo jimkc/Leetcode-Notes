@@ -83,15 +83,16 @@ public class MaxPrintedPages {
         int index = 0;
 
         while (index < n) {
-            // Skip not-yet-activated printers who already missed their window
-            while (index < n && printers.get(index)[0] <= activeCount) {
-                index++; // They never get to activate or print
-            }
 
             // Activate a new printer
             activeQueue.offer(printers.get(index));
             activeCount++;
             index++;
+
+            // Skip not-yet-activated printers who already missed their window
+            while (index < n && printers.get(index)[0] <= activeCount) {
+                index++; // They never get to activate or print
+            }
 
             // Suspension check happens AFTER activation
             // Suspend all printers in activeQueue whose threshold ≤ activeCount

@@ -12,7 +12,7 @@ Return the order in which the chef creates the new list. For order id at index 0
 order ids: [a,b,c,d,e] 
 new list: []
 
-### Solution
+### Solution 1 - Brute force
 ```java
 import java.util.ArrayList;
 import java.util.List;
@@ -80,6 +80,129 @@ public class ChefOrderSelector {
         List<Integer> orders = new ArrayList<>(List.of(3, 5, 2, 6, 8, 1, 4, 7));
         List<Integer> finalOrder = selector.findOrder(orders);
         System.out.println("The final order of preparation is: " + finalOrder);
+        // Expected output: [5, 8, 6, 7, 4, 3, 2, 1]
+    }
+}
+```
+
+### Solution 2 - Optimized
+```java
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
+
+public class OptimizedChefOrderSelector {
+
+    // Inner class to represent a node in a doubly linked list.
+    private static class Node {
+        int value;
+        Node prev;
+        Node next;
+
+        Node(int value) {
+            this.value = value;
+        }
+    }
+
+    /**
+     * Checks if a given node is eligible to be picked.
+     * An order is eligible if its value is greater than its neighbors.
+     */
+    private boolean isEligible(Node node) {
+        if (node == null) return false;
+
+        boolean greaterThanPrev = (node.prev == null) || (node.value > node.prev.value);
+        boolean greaterThanNext = (node.next == null) || (node.value > node.next.value);
+
+        return greaterThanPrev && greaterThanNext;
+    }
+
+    /**
+     * Finds the preparation order with O(n log n) time complexity.
+     *
+     * @param orderIds A list of unique integer order IDs.
+     * @return A list of order IDs in the sequence they are prepared.
+     */
+    public List<Integer> findOrder(List<Integer> orderIds) {
+        if (orderIds == null || orderIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        // 1. Setup data structures
+        List<Integer> result = new ArrayList<>();
+        Map<Integer, Node> nodeMap = new HashMap<>();
+        PriorityQueue<Integer> eligibleOrdersHeap = new PriorityQueue<>();
+
+        // 2. Build the doubly linked list
+        Node head = null, tail = null;
+        for (int id : orderIds) {
+            Node newNode = new Node(id);
+            nodeMap.put(id, newNode);
+            if (head == null) {
+                head = tail = newNode;
+            } else {
+                tail.next = newNode;
+                newNode.prev = tail;
+                tail = newNode;
+            }
+        }
+
+        // 3. Initial scan to find all currently eligible orders
+        for (Node node : nodeMap.values()) {
+            if (isEligible(node)) {
+                eligibleOrdersHeap.add(node.value);
+            }
+        }
+
+        // 4. Main loop: process orders until the heap is empty
+        while (!eligibleOrdersHeap.isEmpty()) {
+            // Get the smallest eligible order
+            int smallestEligibleId = eligibleOrdersHeap.poll();
+            result.add(smallestEligibleId);
+
+            Node nodeToRemove = nodeMap.get(smallestEligibleId);
+
+            // Keep track of neighbors before removal
+            Node prevNode = nodeToRemove.prev;
+            Node nextNode = nodeToRemove.next;
+
+            // Remove the node from the doubly linked list
+            if (prevNode != null) {
+                prevNode.next = nextNode;
+            }
+            if (nextNode != null) {
+                nextNode.prev = prevNode;
+            }
+
+            // Check if the neighbors' eligibility has changed.
+            // A formerly ineligible neighbor might become eligible now.
+            // We must remove them from the heap if they were in it and add them back
+            // to ensure their eligibility is re-evaluated relative to other eligible orders.
+            // A simple approach is to remove and re-add if eligible.
+            if (prevNode != null) {
+                eligibleOrdersHeap.remove(prevNode.value); // O(k) but k is small in practice
+                if (isEligible(prevNode)) {
+                    eligibleOrdersHeap.add(prevNode.value);
+                }
+            }
+            if (nextNode != null) {
+                eligibleOrdersHeap.remove(nextNode.value);
+                if (isEligible(nextNode)) {
+                    eligibleOrdersHeap.add(nextNode.value);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public static void main(String[] args) {
+        OptimizedChefOrderSelector selector = new OptimizedChefOrderSelector();
+        List<Integer> orders = new ArrayList<>(List.of(3, 5, 2, 6, 8, 1, 4, 7));
+        List<Integer> finalOrder = selector.findOrder(orders);
+        System.out.println("The optimized final order of preparation is: " + finalOrder);
         // Expected output: [5, 8, 6, 7, 4, 3, 2, 1]
     }
 }

@@ -9,24 +9,24 @@ Note:
 
 ### Example 1
 ```
-n = 6
-inventory = [10, 6, 12, 8, 15, 1]
-dispatch1 = 2
-dispatch2 = 3
-skips = 3
+Sample Case 0
+password: "abc" (n = 3)
+attackOrder: [1, 3, 2]
+m: 1
+Total Substrings: (3 * 4) / 2 = 6
+Time t=1:
+The 1st element of attackOrder is 1. The 1st character is attacked.
+The password becomes "*bc".
+The malicious substrings are "*" , "*b", and "*bc". There are 3.
+Is the count (3) >= m (1)? Yes.
+The process stops. The minimum time is 1.
 
-An optimal dispatch strategy is as follows:
+Sample Case 1
 
-1. Your co-worker skips 2 turns, allowing you to empty the inventory of the 1st warehouse.
-2. Your co-worker doesn't skip any turns, and you empty the inventory of the 2nd warehouse.
-3. Your co-worker doesn't skip any turns, and you empty the inventory of the 3rd warehouse.
-4. Your co-worker skips 1 turn, and you drain the inventory of the 4th warehouse.
-5. Your co-worker doesn't skip any turns, and they empty the inventory of the 5th warehouse.
-6. Your co-worker doesn't skip any turns, and you empty the inventory of the 6th warehouse.
-
-As a result, the 1st, 2nd, 3rd, 4th, and 6th warehouses were completely dispatched by you, and the two of you collectively earned 5 credits, which is the maximum possible in this scenario.
-
-Hence, the answer is 5.
+password: "bcdb" (n = 4)
+attackOrder: [2, 4, 1, 3]
+m: 10
+Total Substrings: (4 * 5) / 2 = 10
 ```
 
 ### Function Description

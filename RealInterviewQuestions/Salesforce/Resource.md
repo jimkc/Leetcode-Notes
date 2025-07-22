@@ -16,3 +16,5 @@ https://www.1point3acres.com/bbs/thread-1127679-1-1.html
 https://www.1point3acres.com/bbs/thread-1126767-1-1.html
 https://www.1point3acres.com/bbs/thread-1126476-1-1.html
 https://www.1point3acres.com/bbs/thread-1126757-1-1.html
+https://www.1point3acres.com/bbs/thread-1126378-1-1.html
+https://www.1point3acres.com/bbs/thread-1113875-1-1.html

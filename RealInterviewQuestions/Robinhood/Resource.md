@@ -7,7 +7,6 @@ https://www.1point3acres.com/bbs/thread-1128082-1-1.html v (Leetcode course sche
 https://www.1point3acres.com/bbs/thread-1128257-1-1.html v 
 https://www.1point3acres.com/bbs/thread-1122877-1-1.html v (similar to leetcode 207)
 https://www.1point3acres.com/bbs/thread-1123465-1-1.html v (similar to leetcode 1514)
-https://www.1point3acres.com/bbs/thread-1122094-1-1.html
 https://www.1point3acres.com/bbs/thread-1095586-1-1.html v
 
 ### VO

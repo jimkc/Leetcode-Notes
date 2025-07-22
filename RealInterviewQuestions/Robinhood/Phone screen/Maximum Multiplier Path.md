@@ -85,7 +85,7 @@ class Solution {
                 }
             }
         }
-        visited.remove(curr);  // Backtrack
+        visited.remove(curr);  // Backtrack, so other route can use this node again
         return bestProd;
     }
 }
